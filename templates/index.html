@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>《中国钢铁工业“双碳”愿景及技术路线图》高清图片预览+下载</title>
+  <style>
+    :root {
+      --max-width: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f6f7f9;
+      color: #111;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: #f3f4f6;
+      /* 淡灰背景 */
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 20px;
+      z-index: 10;
+    }
+
+    header .bar {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .title-block h1 {
+      font-size: clamp(18px, 2.5vw, 26px);
+      margin: 0 0 6px;
+      color: #111827;
+    }
+
+    .title-block .subtitle {
+      margin: 0;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid #d1d5db;
+      background: #0ea5e9;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      filter: brightness(0.95);
+    }
+
+    main {
+      max-width: var(--max-width);
+      margin: 16px auto;
+      padding: 0 12px 40px;
+    }
+
+    /* 一行一图（自适应宽度、铺满屏） */
+    .item {
+      margin: 0 0 16px 0;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+    }
+
+    .img-wrap {
+      width: 100%;
+    }
+
+    .img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 10px 12px 12px;
+    }
+
+    .row-actions .btn.secondary {
+      background: #fff;
+      color: #111;
+      border: 1px solid #d1d5db;
+    }
+
+    .row-actions .btn.secondary:hover {
+      background: #f3f4f6;
+    }
+
+    footer {
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 40px;
+      padding: 20px 0;
+    }
+
+    footer a {
+      color: #0ea5e9;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+
+<body>
+  <header>
+    <div class="bar">
+      <div class="title-block">
+        <h1>《中国钢铁工业“双碳”愿景及技术路线图》高清图片预览+下载</h1>
+        <p class="subtitle">图片原始发布时间：2022年9月的某一天 🤦‍♀️</p>
+      </div>
+      <a class="btn" href="{{ url_for('download_all') }}">⬇️ Download All</a>
+    </div>
+  </header>
+
+  <main>
+    {% if imgs %}
+    {% for img in imgs %}
+    <article class="item">
+      <div class="img-wrap">
+        <img src="{{ url_for('static', filename='PthWPics/' + img) }}" alt="{{ img }}" loading="lazy">
+      </div>
+      <div class="row-actions">
+        <a class="btn secondary" href="{{ url_for('static', filename='PthWPics/' + img) }}" target="_blank">Open</a>
+        <a class="btn" href="{{ url_for('download_image', filename=img) }}">Download</a>
+      </div>
+    </article>
+    {% endfor %}
+    {% else %}
+    <p>No images found.</p>
+    {% endif %}
+  </main>
+
+  <footer>
+    © 2025 PrDough 🐈‍⬛ <br>
+    来源：微信公众号「铁钢在线」<br>
+    原文题目：超重磅！《中国钢铁工业“双碳”愿景及技术路线图》今日正式发布！<br>
+    链接：
+    <a href="https://mp.weixin.qq.com/s/PhFOtSXZCodzibSeccqQNw" target="_blank">
+      https://mp.weixin.qq.com/s/PhFOtSXZCodzibSeccqQNw
+    </a>
+  </footer>
+</body>
+
+</html>
