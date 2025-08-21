@@ -1,18 +1,15 @@
 from flask import Flask, Response, render_template, send_from_directory, abort
 import os, re, logging, traceback
-import zipstream  # 来自 zipstream-new
+import zipstream  # pip 包：zipstream-new
 
 app = Flask(__name__)
 
-# 图片目录与允许的后缀
 IMG_DIR = os.path.join(app.static_folder, "PthWPics")
 ALLOWED = (".png", ".jpg", ".jpeg", ".gif", ".webp")
 
-# 更详细的日志，方便在 Render Logs 里定位
 app.logger.setLevel(logging.INFO)
 
 def list_images():
-    """列出允许的图片，并按文件名中的数字排序（1,2,3...10...）"""
     if not os.path.isdir(IMG_DIR):
         app.logger.error("IMG_DIR not found: %s", IMG_DIR)
         return []
@@ -33,13 +30,11 @@ def home():
 
 @app.route("/download/<path:filename>")
 def download_image(filename):
-    """下载单张图片"""
     if not filename.lower().endswith(ALLOWED):
         abort(404)
     return send_from_directory(IMG_DIR, filename, as_attachment=True)
 
 def read_in_chunks(path, chunk_size=16 * 1024):
-    """按块读取文件，保证持续向客户端产出数据，避免超时"""
     with open(path, "rb") as f:
         while True:
             chunk = f.read(chunk_size)
@@ -49,7 +44,6 @@ def read_in_chunks(path, chunk_size=16 * 1024):
 
 @app.route("/download/all")
 def download_all():
-    """以流式方式打包所有图片为 zip 并下载；出现异常会在日志中打印堆栈"""
     try:
         if not os.path.exists(IMG_DIR):
             app.logger.error("PthWPics not found on server: %s", IMG_DIR)
@@ -59,15 +53,15 @@ def download_all():
         if not files:
             app.logger.warning("No images to zip in %s", IMG_DIR)
 
-        # 只打包不压缩（更快、更省 CPU），并允许 Zip64
+        # 仅打包不压缩（更快），并允许 Zip64
         z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_STORED, allowZip64=True)
 
         for filename in files:
             path = os.path.join(IMG_DIR, filename)
             if os.path.isfile(path):
                 app.logger.info("Zipping: %s", filename)
-                # 核心：write_iter 用自定义迭代器分块读 -> zipstream 持续 yield 给客户端
-                z.write_iter(arcname=filename, iterator=read_in_chunks(path))
+                # ✅ 关键修正：参数名是 iterable
+                z.write_iter(arcname=filename, iterable=read_in_chunks(path))
             else:
                 app.logger.warning("Skip non-file: %s", path)
 
