@@ -1,6 +1,5 @@
-from flask import Flask, Response, send_from_directory, render_template, abort
-import os, re
-import zipstream
+from flask import Flask, Response, render_template, send_from_directory, abort
+import os, re, zipstream
 
 app = Flask(__name__)
 
@@ -16,7 +15,7 @@ def list_images():
     files = [f for f in os.listdir(IMG_DIR) if f.lower().endswith(ALLOWED)]
 
     def extract_number(filename):
-        match = re.search(r'(\d+)', filename)
+        match = re.search(r"(\d+)", filename)
         return int(match.group(1)) if match else float("inf")
 
     return sorted(files, key=extract_number)
@@ -38,19 +37,17 @@ def download_image(filename):
 
 @app.route("/download/all")
 def download_all():
-    """流式下载所有图片为 zip"""
+    """流式打包所有图片为 zip 并下载"""
     if not os.path.exists(IMG_DIR):
         return "Error: PthWPics folder not found on server.", 404
 
     z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED)
 
-    # 按数字顺序把文件加进 zip
     for filename in list_images():
         file_path = os.path.join(IMG_DIR, filename)
         if os.path.isfile(file_path):
             z.write(file_path, arcname=filename)
 
-    # 返回流式响应
     return Response(
         z,
         mimetype="application/zip",
