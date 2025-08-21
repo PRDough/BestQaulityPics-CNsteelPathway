@@ -1,5 +1,6 @@
-from flask import Flask, send_file, render_template, send_from_directory, abort
-import os, io, zipfile, re
+from flask import Flask, Response, send_from_directory, render_template, abort
+import os, re
+import zipstream
 
 app = Flask(__name__)
 
@@ -37,34 +38,23 @@ def download_image(filename):
 
 @app.route("/download/all")
 def download_all():
-    """打包所有图片下载 (带调试输出)"""
+    """流式下载所有图片为 zip"""
     if not os.path.exists(IMG_DIR):
-        print("❌ Error: PthWPics folder not found!", flush=True)
         return "Error: PthWPics folder not found on server.", 404
 
-    print(f"✅ Looking into folder: {IMG_DIR}", flush=True)
-    try:
-        files = os.listdir(IMG_DIR)
-        print("📂 Files found:", files, flush=True)
-    except Exception as e:
-        print("⚠️ os.listdir failed:", e, flush=True)
-        return "Error reading directory", 500
+    z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED)
 
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, "w", zipfile.ZIP_DEFLATED) as zf:
-        for filename in sorted(files):
-            if filename.lower().endswith(ALLOWED):
-                file_path = os.path.join(IMG_DIR, filename)
-                if os.path.isfile(file_path):
-                    print(f"➕ Adding {filename} to zip", flush=True)
-                    zf.write(file_path, arcname=filename)
-    memory_file.seek(0)
+    # 按数字顺序把文件加进 zip
+    for filename in list_images():
+        file_path = os.path.join(IMG_DIR, filename)
+        if os.path.isfile(file_path):
+            z.write(file_path, arcname=filename)
 
-    return send_file(
-        memory_file,
-        as_attachment=True,
-        download_name="all_PthWPics.zip",
-        mimetype="application/zip"
+    # 返回流式响应
+    return Response(
+        z,
+        mimetype="application/zip",
+        headers={"Content-Disposition": "attachment; filename=all_PthWPics.zip"}
     )
 
 
